@@ -1,0 +1,274 @@
+[
+  {
+    "exercise_id": "ex-001",
+    "name": "Diaphragmatic Breathing",
+    "category": "breathing",
+    "intensity": "very_low",
+    "duration_minutes": 10,
+    "equipment": ["none"],
+    "steps": [
+      {"step_number": 1, "instruction": "Lie on your back or sit comfortably. Place one hand on your chest and one on your abdomen.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Inhale slowly through your nose for 4 counts. Feel your abdomen rise — your chest should stay still.", "duration_seconds": 60},
+      {"step_number": 3, "instruction": "Hold for 2 counts.", "duration_seconds": 30},
+      {"step_number": 4, "instruction": "Exhale slowly through pursed lips for 6 counts. Feel your abdomen fall.", "duration_seconds": 60},
+      {"step_number": 5, "instruction": "Repeat for 10 minutes.", "duration_seconds": 540}
+    ],
+    "contraindications": ["acute_respiratory_illness"],
+    "benefits": ["BP reduction", "stress relief", "improved SpO2", "parasympathetic activation"],
+    "modifications": [{"condition": "COPD", "modified_instruction": "Reduce hold to 1 count. Focus on exhale length."}],
+    "evidence_source": "AHA Exercise Guidelines 2024"
+  },
+  {
+    "exercise_id": "ex-002",
+    "name": "Anulom Vilom (Alternate Nostril Breathing)",
+    "category": "breathing",
+    "intensity": "very_low",
+    "duration_minutes": 10,
+    "equipment": ["none"],
+    "steps": [
+      {"step_number": 1, "instruction": "Sit cross-legged or in a chair with spine straight.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Close right nostril with right thumb. Inhale through left nostril for 4 counts.", "duration_seconds": 40},
+      {"step_number": 3, "instruction": "Close left nostril with ring finger. Release right nostril. Exhale for 8 counts.", "duration_seconds": 60},
+      {"step_number": 4, "instruction": "Inhale through right nostril for 4 counts. Switch and exhale through left for 8 counts.", "duration_seconds": 60},
+      {"step_number": 5, "instruction": "This is one cycle. Repeat for 10 minutes.", "duration_seconds": 540}
+    ],
+    "contraindications": ["acute_cold", "nasal_blockage"],
+    "benefits": ["BP reduction", "stress relief", "mental clarity", "improved lung capacity"],
+    "modifications": [],
+    "evidence_source": "Yoga Research Foundation; Pranayama for Hypertension Meta-analysis 2022"
+  },
+  {
+    "exercise_id": "ex-003",
+    "name": "Gentle Morning Walk",
+    "category": "cardio",
+    "intensity": "low",
+    "duration_minutes": 20,
+    "equipment": ["comfortable footwear"],
+    "steps": [
+      {"step_number": 1, "instruction": "Begin at a slow comfortable pace for first 3 minutes (warm-up).", "duration_seconds": 180},
+      {"step_number": 2, "instruction": "Maintain a pace where you can hold a conversation — slightly breathless is fine.", "duration_seconds": 900},
+      {"step_number": 3, "instruction": "Slow down for last 3 minutes (cool-down).", "duration_seconds": 180}
+    ],
+    "contraindications": ["acute_joint_injury", "post_surgery_recovery"],
+    "benefits": ["cardiovascular health", "blood sugar regulation", "mood improvement", "weight management"],
+    "modifications": [{"condition": "knee_pain", "modified_instruction": "Walk on flat surfaces only. Avoid inclines."}],
+    "evidence_source": "WHO Physical Activity Guidelines 2023"
+  },
+  {
+    "exercise_id": "ex-004",
+    "name": "Post-Meal Walk",
+    "category": "cardio",
+    "intensity": "very_low",
+    "duration_minutes": 15,
+    "equipment": ["none"],
+    "steps": [
+      {"step_number": 1, "instruction": "Begin 10-15 minutes after finishing your meal.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Walk at a leisurely strolling pace — significantly slower than your normal walk.", "duration_seconds": 840},
+      {"step_number": 3, "instruction": "Avoid anything more strenuous for 45 minutes after eating.", "duration_seconds": 30}
+    ],
+    "contraindications": [],
+    "benefits": ["blood sugar spike reduction", "improved digestion", "insulin sensitivity"],
+    "modifications": [],
+    "evidence_source": "Diabetes Care Journal 2022 — Post-meal walking and glycaemic control"
+  },
+  {
+    "exercise_id": "ex-005",
+    "name": "Chair-Based Seated Stretches",
+    "category": "flexibility",
+    "intensity": "very_low",
+    "duration_minutes": 15,
+    "equipment": ["chair"],
+    "steps": [
+      {"step_number": 1, "instruction": "Sit at edge of chair. Roll shoulders backward 10 times, then forward 10 times.", "duration_seconds": 60},
+      {"step_number": 2, "instruction": "Neck tilt: slowly tilt head to right shoulder, hold 20 seconds. Switch sides.", "duration_seconds": 60},
+      {"step_number": 3, "instruction": "Seated spinal twist: hands on armrests, twist torso right and hold 20 seconds. Switch.", "duration_seconds": 60},
+      {"step_number": 4, "instruction": "Seated forward bend: feet flat, hinge forward slowly from hips, hands toward floor. Hold 30 seconds.", "duration_seconds": 60},
+      {"step_number": 5, "instruction": "Ankle rolls: lift both feet, rotate ankles clockwise 10 times, then counter-clockwise.", "duration_seconds": 60}
+    ],
+    "contraindications": ["acute_spinal_injury"],
+    "benefits": ["flexibility", "circulation", "joint mobility", "office worker fatigue relief"],
+    "modifications": [{"condition": "herniated_disc", "modified_instruction": "Skip forward bend. Consult physio first."}],
+    "evidence_source": "American College of Sports Medicine"
+  },
+  {
+    "exercise_id": "ex-006",
+    "name": "Wall Push-Ups",
+    "category": "strength",
+    "intensity": "low",
+    "duration_minutes": 10,
+    "equipment": ["wall"],
+    "steps": [
+      {"step_number": 1, "instruction": "Stand arm's length from wall. Place palms flat on wall at shoulder height.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Bend elbows slowly to bring chest toward wall. Keep body straight.", "duration_seconds": 30},
+      {"step_number": 3, "instruction": "Push back to start. Do 3 sets of 10 repetitions with 60-second rest between sets.", "duration_seconds": 480}
+    ],
+    "contraindications": ["shoulder_injury", "acute_wrist_pain"],
+    "benefits": ["upper body strength", "bone density", "low-impact resistance training"],
+    "modifications": [{"condition": "hypertension", "modified_instruction": "Avoid holding breath. Exhale on push phase."}],
+    "evidence_source": "NHS Exercise Guidelines"
+  },
+  {
+    "exercise_id": "ex-007",
+    "name": "Bodyweight Squats",
+    "category": "strength",
+    "intensity": "moderate",
+    "duration_minutes": 15,
+    "equipment": ["none"],
+    "steps": [
+      {"step_number": 1, "instruction": "Stand with feet shoulder-width apart, toes slightly out.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Lower slowly as if sitting into a chair — keep chest up, knees over toes.", "duration_seconds": 30},
+      {"step_number": 3, "instruction": "Go to 90 degrees or as low as comfortable. Return to standing.", "duration_seconds": 30},
+      {"step_number": 4, "instruction": "3 sets of 12 repetitions. Rest 90 seconds between sets.", "duration_seconds": 720}
+    ],
+    "contraindications": ["knee_replacement", "severe_knee_osteoarthritis", "acute_lower_back_pain"],
+    "benefits": ["leg strength", "insulin sensitivity", "metabolic health", "functional mobility"],
+    "modifications": [{"condition": "knee_pain", "modified_instruction": "Half squat only — go to 45 degrees. Use chair for support."}],
+    "evidence_source": "ACSM Resistance Training Guidelines 2023"
+  },
+  {
+    "exercise_id": "ex-008",
+    "name": "Surya Namaskar (Modified — 6 rounds)",
+    "category": "flexibility",
+    "intensity": "moderate",
+    "duration_minutes": 20,
+    "equipment": ["yoga mat"],
+    "steps": [
+      {"step_number": 1, "instruction": "Mountain pose: stand tall, palms together at chest. Take 3 deep breaths.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Arms up: inhale, raise arms overhead. Slight backbend.", "duration_seconds": 20},
+      {"step_number": 3, "instruction": "Forward fold: exhale, hinge at hips, reach toward floor. Bend knees generously.", "duration_seconds": 30},
+      {"step_number": 4, "instruction": "Lunge: inhale, step right leg back. Left knee over ankle.", "duration_seconds": 30},
+      {"step_number": 5, "instruction": "Plank: hold 5-10 seconds (skip if shoulder/wrist issue).", "duration_seconds": 15},
+      {"step_number": 6, "instruction": "Child's pose instead of upward dog for beginners. Hold 20 seconds.", "duration_seconds": 20},
+      {"step_number": 7, "instruction": "Downward dog: hips high, heels toward floor. 5 breaths.", "duration_seconds": 30},
+      {"step_number": 8, "instruction": "Reverse the sequence. Complete 6 rounds at a comfortable pace.", "duration_seconds": 900}
+    ],
+    "contraindications": ["hypertension_severe", "recent_cardiac_event", "pregnancy_third_trimester"],
+    "benefits": ["full body flexibility", "strength", "cardiovascular", "mental clarity"],
+    "modifications": [{"condition": "hypertension", "modified_instruction": "Skip plank and downward dog — do standing sequences only."}],
+    "evidence_source": "Indian Journal of Physiology and Pharmacology"
+  },
+  {
+    "exercise_id": "ex-009",
+    "name": "Resistance Band Rows",
+    "category": "strength",
+    "intensity": "moderate",
+    "duration_minutes": 15,
+    "equipment": ["resistance band"],
+    "steps": [
+      {"step_number": 1, "instruction": "Anchor band to door handle or post at waist height.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Hold both ends, step back until band has tension. Hinge slightly at hips.", "duration_seconds": 30},
+      {"step_number": 3, "instruction": "Pull elbows back squeezing shoulder blades together. Hold 1 second at peak.", "duration_seconds": 30},
+      {"step_number": 4, "instruction": "3 sets of 12. Rest 60 seconds between sets.", "duration_seconds": 720}
+    ],
+    "contraindications": ["shoulder_surgery_recent"],
+    "benefits": ["back strength", "posture improvement", "upper body muscle"],
+    "modifications": [],
+    "evidence_source": "ACSM"
+  },
+  {
+    "exercise_id": "ex-010",
+    "name": "Balance Standing (Single Leg)",
+    "category": "rehabilitation",
+    "intensity": "very_low",
+    "duration_minutes": 10,
+    "equipment": ["wall or chair for support"],
+    "steps": [
+      {"step_number": 1, "instruction": "Stand near wall for support. Lift one foot slightly off ground.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Hold balance for 10-30 seconds. Use wall only if needed.", "duration_seconds": 60},
+      {"step_number": 3, "instruction": "Switch feet. Repeat 5 times per side.", "duration_seconds": 480}
+    ],
+    "contraindications": ["severe_vertigo", "acute_ankle_injury"],
+    "benefits": ["fall prevention", "ankle stability", "proprioception", "elderly fitness"],
+    "modifications": [{"condition": "elderly", "modified_instruction": "Always have chair nearby. Lift foot only 5cm."}],
+    "evidence_source": "British Geriatrics Society Fall Prevention Guidelines"
+  },
+  {
+    "exercise_id": "ex-011",
+    "name": "Bhramari Pranayama (Humming Bee Breath)",
+    "category": "breathing",
+    "intensity": "very_low",
+    "duration_minutes": 8,
+    "equipment": ["none"],
+    "steps": [
+      {"step_number": 1, "instruction": "Sit comfortably with eyes closed. Plug both ears with thumbs.", "duration_seconds": 30},
+      {"step_number": 2, "instruction": "Inhale deeply through nose.", "duration_seconds": 20},
+      {"step_number": 3, "instruction": "Exhale slowly while making a steady humming sound like a bee.", "duration_seconds": 60},
+      {"step_number": 4, "instruction": "Repeat 10-12 times.", "duration_seconds": 390}
+    ],
+    "contraindications": ["ear_infection"],
+    "benefits": ["blood pressure reduction", "stress relief", "migraine relief", "tinnitus management"],
+    "modifications": [],
+    "evidence_source": "International Journal of Yoga 2020"
+  },
+  {
+    "exercise_id": "ex-012",
+    "name": "Seated Leg Raises",
+    "category": "rehabilitation",
+    "intensity": "very_low",
+    "duration_minutes": 10,
+    "equipment": ["chair"],
+    "steps": [
+      {"step_number": 1, "instruction": "Sit in chair with back straight, feet flat on floor.", "duration_seconds": 20},
+      {"step_number": 2, "instruction": "Straighten one leg parallel to floor. Hold 5 seconds.", "duration_seconds": 30},
+      {"step_number": 3, "instruction": "Lower slowly. Alternate legs. 3 sets of 15 per leg.", "duration_seconds": 540}
+    ],
+    "contraindications": ["recent_hip_replacement", "severe_hip_osteoarthritis"],
+    "benefits": ["quadricep strength", "knee stability", "post-surgery rehabilitation"],
+    "modifications": [],
+    "evidence_source": "Physiotherapy Evidence Database"
+  },
+  {
+    "exercise_id": "ex-013",
+    "name": "Standing Calf Raises",
+    "category": "strength",
+    "intensity": "low",
+    "duration_minutes": 8,
+    "equipment": ["wall for balance"],
+    "steps": [
+      {"step_number": 1, "instruction": "Stand with feet hip-width apart. Light fingertip touch on wall.", "duration_seconds": 20},
+      {"step_number": 2, "instruction": "Rise up on toes slowly over 2 counts.", "duration_seconds": 20},
+      {"step_number": 3, "instruction": "Hold 1 second at top.", "duration_seconds": 10},
+      {"step_number": 4, "instruction": "Lower slowly over 3 counts. 3 sets of 15.", "duration_seconds": 420}
+    ],
+    "contraindications": ["plantar_fasciitis_severe", "ankle_surgery_recent"],
+    "benefits": ["calf strength", "circulation", "fall prevention", "diabetes management"],
+    "modifications": [{"condition": "elderly", "modified_instruction": "Use both hands on wall. Reduce range of motion."}],
+    "evidence_source": "American Diabetes Association"
+  },
+  {
+    "exercise_id": "ex-014",
+    "name": "Gentle Yoga — Child's Pose Flow",
+    "category": "flexibility",
+    "intensity": "very_low",
+    "duration_minutes": 15,
+    "equipment": ["yoga mat"],
+    "steps": [
+      {"step_number": 1, "instruction": "Start in child's pose: kneel, hips to heels, arms extended forward. Hold 2 minutes.", "duration_seconds": 120},
+      {"step_number": 2, "instruction": "Cat-Cow: on hands and knees. Inhale — back sways down (cow). Exhale — back rounds up (cat). 10 cycles.", "duration_seconds": 120},
+      {"step_number": 3, "instruction": "Thread the needle: from all-fours, slide right arm under left, rest right shoulder on mat. Hold 45 sec each side.", "duration_seconds": 120},
+      {"step_number": 4, "instruction": "Return to child's pose. Rest 2 minutes.", "duration_seconds": 120}
+    ],
+    "contraindications": ["severe_knee_pain", "late_pregnancy"],
+    "benefits": ["spinal decompression", "hip flexibility", "nervous system calm", "back pain relief"],
+    "modifications": [],
+    "evidence_source": "Yoga Therapy Evidence Review 2021"
+  },
+  {
+    "exercise_id": "ex-015",
+    "name": "Brisk Walk with Arm Swing",
+    "category": "cardio",
+    "intensity": "moderate",
+    "duration_minutes": 30,
+    "equipment": ["comfortable footwear"],
+    "steps": [
+      {"step_number": 1, "instruction": "Warm up with 5 minutes of slow walk.", "duration_seconds": 300},
+      {"step_number": 2, "instruction": "Increase pace to brisk — 5-6 km/h target. Swing arms actively.", "duration_seconds": 1200},
+      {"step_number": 3, "instruction": "Maintain pace where you can barely sing but can speak in short sentences.", "duration_seconds": 0},
+      {"step_number": 4, "instruction": "Cool down 5 minutes slow walk.", "duration_seconds": 300}
+    ],
+    "contraindications": ["recent_cardiac_event", "severe_joint_pain", "post_surgery_recovery"],
+    "benefits": ["cardiovascular fitness", "weight management", "cholesterol", "mental health"],
+    "modifications": [{"condition": "hypertension", "modified_instruction": "Keep HR below 65% max (220 - age). Use rate of perceived exertion: 5/10."}],
+    "evidence_source": "WHO Physical Activity Guidelines 2023"
+  }
+]
