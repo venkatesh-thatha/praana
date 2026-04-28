@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Literal
 from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field
@@ -71,7 +71,7 @@ class FoodLogEntry(BaseModel):
     food_log_text: str
     parsed_items: list[ParsedFoodItem] = Field(default_factory=list)
     analysis: DietAnalysis | None = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class DietLogRequest(BaseModel):

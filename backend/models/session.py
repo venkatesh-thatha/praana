@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field

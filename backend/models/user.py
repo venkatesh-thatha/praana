@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Literal
 from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
@@ -22,7 +22,19 @@ class UserInDB(BaseModel):
     user_id: str = Field(default_factory=lambda: str(uuid4()))
     email: EmailStr
     password_hash: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class EyePrescription(BaseModel):
+    sphere: float | None = None     # e.g. -2.5
+    cylinder: float | None = None   # e.g. -0.75
+    axis: int | None = None         # degrees 0-180
+
+
+class EmergencyContact(BaseModel):
+    name: str | None = None
+    phone: str | None = None
+    relation: str | None = None     # e.g. Spouse, Parent, Sibling
 
 
 class PersonalInfo(BaseModel):
@@ -36,6 +48,9 @@ class PersonalInfo(BaseModel):
     city: str | None = None
     state: str | None = None
     language_pref: Literal['en', 'hi', 'ta'] = 'en'
+    right_eye: EyePrescription = Field(default_factory=EyePrescription)
+    left_eye: EyePrescription = Field(default_factory=EyePrescription)
+    emergency_contact: EmergencyContact = Field(default_factory=EmergencyContact)
 
 
 class MedicalHistory(BaseModel):
@@ -43,6 +58,7 @@ class MedicalHistory(BaseModel):
     medications: list[str] = Field(default_factory=list)
     allergies: list[str] = Field(default_factory=list)
     surgeries: list[str] = Field(default_factory=list)
+    family_history: list[str] = Field(default_factory=list)
 
 
 class DietInfo(BaseModel):

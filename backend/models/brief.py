@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -50,7 +50,7 @@ class BriefRecord(BaseModel):
     brief_id: str = Field(default_factory=lambda: str(uuid4()))
     user_id: str
     session_id: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     brief_data: dict
     pdf_stored: bool = False
 

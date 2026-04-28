@@ -10,6 +10,12 @@ from .prompts import (
     VITALS_PATTERN_ANALYST_PROMPT,
     DOCTOR_BRIEF_WRITER_PROMPT,
     EXERCISE_RECOMMENDER_PROMPT,
+    LAB_REPORT_ANALYST_PROMPT,
+    WELLNESS_TIP_PROMPT,
+    AYURVEDIC_PLANT_PROMPT,
+    SKIN_ANALYSER_PROMPT,
+    XRAY_ANALYSER_PROMPT,
+    HERBS_REMEDY_PROMPT,
 )
 
 logger = logging.getLogger(__name__)
@@ -140,7 +146,7 @@ async def recommend_exercise(
     )
     response = await client.messages.create(
         model=MODEL,
-        max_tokens=2048,
+        max_tokens=3500,
         system=EXERCISE_RECOMMENDER_PROMPT,
         messages=[{'role': 'user', 'content': user_msg}],
     )
@@ -155,3 +161,173 @@ async def recommend_exercise(
 async def generate_brief(all_data: dict) -> dict:
     user_msg = f'Session Data:\n{json.dumps(all_data, default=str)}'
     return await _call_claude(DOCTOR_BRIEF_WRITER_PROMPT, user_msg, max_tokens=3000)
+
+
+async def analyze_lab_report(image_base64: str, media_type: str, user_profile: dict) -> dict:
+    """Analyze a lab report image or PDF using Claude Vision / Document API."""
+    client = _get_client()
+
+    if media_type == 'application/pdf':
+        content_block = {
+            'type': 'document',
+            'source': {'type': 'base64', 'media_type': 'application/pdf', 'data': image_base64},
+        }
+    else:
+        content_block = {
+            'type': 'image',
+            'source': {'type': 'base64', 'media_type': media_type, 'data': image_base64},
+        }
+
+    try:
+        response = await client.messages.create(
+            model=MODEL,
+            max_tokens=4096,
+            system=LAB_REPORT_ANALYST_PROMPT,
+            messages=[{
+                'role': 'user',
+                'content': [
+                    content_block,
+                    {
+                        'type': 'text',
+                        'text': (
+                            f'Patient Profile:\n{json.dumps(user_profile, default=str)}\n\n'
+                            'Analyze this lab report. Extract all test values, flag abnormal ones, '
+                            'and provide plain language explanations. Cross-reference with the patient profile provided.'
+                        ),
+                    },
+                ],
+            }],
+        )
+        text = _strip_fences(response.content[0].text)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            logger.error('Claude (analyze_lab_report) returned non-JSON. Raw text: %s', text[:500])
+            raise ValueError(f'Lab report analysis failed to parse: {e}') from e
+    except Exception as e:
+        logger.error('analyze_lab_report error: %s', str(e))
+        raise
+
+
+async def generate_wellness_content(user_profile: dict) -> dict:
+    """Return both a daily wellness tip and an Ayurvedic plant suggestion via two parallel Claude calls."""
+    import asyncio
+
+    tip_msg = (
+        f'Patient Profile:\n{json.dumps(user_profile, default=str)}\n\n'
+        'Generate a personalized wellness tip for today.'
+    )
+    plant_msg = (
+        f'Patient Profile:\n{json.dumps(user_profile, default=str)}\n\n'
+        'Suggest one Ayurvedic plant or herb relevant to this patient.'
+    )
+
+    tip_result, plant_result = await asyncio.gather(
+        _call_claude(WELLNESS_TIP_PROMPT, tip_msg, max_tokens=1024),
+        _call_claude(AYURVEDIC_PLANT_PROMPT, plant_msg, max_tokens=1024),
+    )
+    return {'tip': tip_result, 'plant': plant_result}
+
+
+async def analyze_skin(image_base64: str, media_type: str, user_profile: dict) -> dict:
+    """Analyze a skin photo using Claude Vision cross-referenced with patient profile."""
+    client = _get_client()
+    try:
+        response = await client.messages.create(
+            model=MODEL,
+            max_tokens=4096,
+            system=SKIN_ANALYSER_PROMPT,
+            messages=[{
+                'role': 'user',
+                'content': [
+                    {
+                        'type': 'image',
+                        'source': {'type': 'base64', 'media_type': media_type, 'data': image_base64},
+                    },
+                    {
+                        'type': 'text',
+                        'text': (
+                            f'Patient Profile:\n{json.dumps(user_profile, default=str)}\n\n'
+                            'Analyze this skin image. Cross-reference with the patient profile '
+                            'for any relevant conditions or medications that affect your assessment.'
+                        ),
+                    },
+                ],
+            }],
+        )
+        text = _strip_fences(response.content[0].text)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            logger.error('analyze_skin returned non-JSON: %s', text[:500])
+            raise ValueError(f'Skin analysis failed to parse: {e}') from e
+    except Exception as e:
+        logger.error('analyze_skin error: %s', str(e))
+        raise
+
+
+async def analyze_xray(image_base64: str, media_type: str, user_profile: dict) -> dict:
+    """Analyze an X-ray image using Claude Vision with patient profile context."""
+    client = _get_client()
+
+    if media_type == 'application/pdf':
+        content_block = {
+            'type': 'document',
+            'source': {'type': 'base64', 'media_type': 'application/pdf', 'data': image_base64},
+        }
+    else:
+        content_block = {
+            'type': 'image',
+            'source': {'type': 'base64', 'media_type': media_type, 'data': image_base64},
+        }
+
+    try:
+        response = await client.messages.create(
+            model=MODEL,
+            max_tokens=4096,
+            system=XRAY_ANALYSER_PROMPT,
+            messages=[{
+                'role': 'user',
+                'content': [
+                    content_block,
+                    {
+                        'type': 'text',
+                        'text': (
+                            f'Patient Profile:\n{json.dumps(user_profile, default=str)}\n\n'
+                            'Analyze this X-ray. Describe the visible structures and findings, '
+                            'provide density assessments, and cross-reference with the patient profile.'
+                        ),
+                    },
+                ],
+            }],
+        )
+        text = _strip_fences(response.content[0].text)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            logger.error('analyze_xray returned non-JSON: %s', text[:500])
+            raise ValueError(f'X-ray analysis failed to parse: {e}') from e
+    except Exception as e:
+        logger.error('analyze_xray error: %s', str(e))
+        raise
+
+
+async def generate_remedies(user_profile: dict) -> dict:
+    """Generate personalized Indian home remedy suggestions based on user profile."""
+    client = _get_client()
+    user_msg = (
+        f'Patient Profile:\n{json.dumps(user_profile, default=str)}\n\n'
+        'Generate 3-4 personalized Indian home remedies.'
+    )
+    response = await client.messages.create(
+        model=MODEL,
+        max_tokens=2000,
+        system=HERBS_REMEDY_PROMPT,
+        messages=[{'role': 'user', 'content': user_msg}],
+    )
+    text = _strip_fences(response.content[0].text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        logger.error('Claude (generate_remedies) returned non-JSON: %s', text[:300])
+        raise ValueError(f'Non-JSON response from Claude: {e}') from e

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -8,7 +8,7 @@ class VitalsEntry(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     vitals_id: str = Field(default_factory=lambda: str(uuid4()))
     user_id: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     hr_bpm: float | None = Field(default=None, gt=0, le=300)
     bp_systolic: float | None = Field(default=None, gt=0, le=300)
     bp_diastolic: float | None = Field(default=None, gt=0, le=200)

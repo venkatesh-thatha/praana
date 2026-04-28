@@ -23,7 +23,7 @@ class IngredientResult(BaseModel):
     safety_level: Literal['safe', 'caution', 'avoid']
     profile_interaction: bool = False
     interaction_detail: str | None = None
-    score_weight: int = Field(ge=0)
+    score_weight: int = Field(default=0, ge=0)
 
 
 class ScanResult(BaseModel):
