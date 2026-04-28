@@ -14,7 +14,7 @@ async def create_or_update_profile(
     db=Depends(get_db),
 ):
     user_id = current_user['user_id']
-    await upsert_profile(db, user_id, body.model_dump())
+    await upsert_profile(db, user_id, body.model_dump(mode='json', exclude_none=True))
     return {'message': 'Profile saved', 'user_id': user_id}
 
 

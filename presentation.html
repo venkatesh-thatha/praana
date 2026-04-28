@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Praana — CBC Spring 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #090b09;
+    --surface: #161a16;
+    --sage: #8fbf6e;
+    --sage-light: #b8d99c;
+    --gold: #c9a84c;
+    --danger: #d97272;
+    --ivory: #ede9e0;
+    --muted: #7a7a6e;
+    --blue: #8090d0;
+    --purple: #b080d0;
+    --teal: #50c8b0;
+    --orange: #e09050;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+    color: var(--ivory);
+  }
+
+  .deck {
+    width: 100vw; height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 64px 80px;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    pointer-events: none;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  .slide::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 200;
+    background: rgba(22,26,22,0.85);
+    border: 1px solid rgba(143,191,110,0.12);
+    backdrop-filter: blur(16px);
+    border-radius: 100px;
+    padding: 10px 20px;
+  }
+
+  .nav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .nav button:hover { color: var(--ivory); background: rgba(255,255,255,0.05); }
+
+  .slide-counter {
+    font-size: 12px;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--sage), var(--teal));
+    transition: width 0.4s ease;
+    z-index: 200;
+  }
+
+  /* ── LOGO MARK ── */
+  .logo-mark {
+    position: fixed;
+    top: 28px; left: 36px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 200;
+    opacity: 0.5;
+  }
+
+  .logo-icon {
+    width: 28px; height: 28px;
+    background: rgba(143,191,110,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ivory);
+    letter-spacing: -0.02em;
+  }
+
+  /* ── SLIDE NUMBER INDICATOR ── */
+  .slide-label {
+    position: fixed;
+    top: 28px; right: 36px;
+    font-size: 11px;
+    color: rgba(143,191,110,0.35);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    z-index: 200;
+    font-weight: 600;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(143,191,110,0.55);
+    margin-bottom: 16px;
+  }
+
+  h1, h2 {
+    font-family: 'Syne', sans-serif;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  h1 { font-size: clamp(40px, 5.5vw, 72px); font-weight: 800; }
+  h2 { font-size: clamp(28px, 3.8vw, 52px); font-weight: 700; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--teal) 50%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hook {
+    font-size: clamp(16px, 1.8vw, 22px);
+    color: var(--muted);
+    max-width: 680px;
+    line-height: 1.6;
+    margin-top: 20px;
+    font-weight: 400;
+  }
+
+  .hook strong {
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ── BULLET LIST ── */
+  .bullets {
+    list-style: none;
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 760px;
+  }
+
+  .bullets li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: clamp(14px, 1.3vw, 17px);
+    color: rgba(237,233,224,0.8);
+    line-height: 1.55;
+  }
+
+  .bullets li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sage);
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .bullets li strong { color: var(--ivory); font-weight: 600; }
+  .bullets li .tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ── STAT CALLOUT ── */
+  .stat-box {
+    margin-top: 36px;
+    padding: 18px 24px;
+    border-radius: 16px;
+    background: rgba(143,191,110,0.06);
+    border: 1px solid rgba(143,191,110,0.15);
+    display: inline-block;
+    max-width: 640px;
+  }
+
+  .stat-box .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 800;
+    color: var(--sage);
+    line-height: 1;
+  }
+
+  .stat-box .stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* ── FEATURE GRID ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .feature-card {
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(22,26,22,0.8);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .feature-card .fc-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .feature-card .fc-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ivory);
+    margin-bottom: 4px;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .feature-card .fc-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    max-width: 700px;
+  }
+
+  .arch-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .arch-node {
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .arch-arrow {
+    color: var(--muted);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .arch-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(143,191,110,0.2);
+    margin: 4px 0 4px 60px;
+  }
+
+  /* ── TWO COLUMN LAYOUT ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 24px;
+    align-items: start;
+  }
+
+  /* ── HERO DECORATIONS ── */
+  .hero-glow {
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(143,191,110,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-glow-2 {
+    position: absolute;
+    bottom: -150px; left: 30%;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(128,144,208,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── PILL BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+
+  .badge-sage { background: rgba(143,191,110,0.12); color: var(--sage); border: 1px solid rgba(143,191,110,0.25); }
+  .badge-gold { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.25); }
+  .badge-blue { background: rgba(128,144,208,0.12); color: var(--blue); border: 1px solid rgba(128,144,208,0.25); }
+  .badge-danger { background: rgba(217,114,114,0.12); color: var(--danger); border: 1px solid rgba(217,114,114,0.25); }
+  .badge-purple { background: rgba(176,128,208,0.12); color: var(--purple); border: 1px solid rgba(176,128,208,0.25); }
+  .badge-teal { background: rgba(80,200,176,0.12); color: var(--teal); border: 1px solid rgba(80,200,176,0.25); }
+
+  /* ── BIG QUOTE ── */
+  .big-quote {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(20px, 2.5vw, 32px);
+    font-weight: 700;
+    color: var(--ivory);
+    line-height: 1.3;
+    max-width: 760px;
+    margin-top: 16px;
+  }
+
+  .big-quote em {
+    font-style: normal;
+    color: var(--sage);
+  }
+
+  /* ── KEYBOARD HINT ── */
+  .key-hint {
+    position: fixed;
+    bottom: 84px;
+    right: 36px;
+    font-size: 11px;
+    color: rgba(122,122,110,0.4);
+    z-index: 200;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="logo-mark">
+  <div class="logo-icon">🌿</div>
+  <span class="logo-text">Praana</span>
+</div>
+
+<div class="slide-label" id="slideLabel">CBC Spring 2026</div>
+<div class="key-hint">← → or click buttons</div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: HERO -->
+  <div class="slide active" data-index="0">
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+    <div class="eyebrow">CBC Spring 2026 · Track 1 — Biology &amp; Physical Health</div>
+    <h1><span class="gradient-text">Praana</span></h1>
+    <h1 style="color: var(--ivory); margin-top: 4px;">India's Intelligent</h1>
+    <h1 style="color: var(--ivory);">Health Companion</h1>
+    <p class="hook">
+      <strong>1.4 billion people. 1 doctor for every 1,457 of them.</strong><br>
+      What happens in between visits?
+    </p>
+    <div style="margin-top: 36px; display: flex; flex-wrap: wrap; gap: 0;">
+      <span class="badge badge-sage">🧠 AI Symptom Analysis</span>
+      <span class="badge badge-blue">🔬 Lab Report Interpreter</span>
+      <span class="badge badge-gold">📋 Doctor Brief PDF</span>
+      <span class="badge badge-purple">📷 Skin + X-Ray Scanner</span>
+      <span class="badge badge-teal">हिंदी · தமிழ் · English</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: THE PROBLEM -->
+  <div class="slide" data-index="1">
+    <div class="hero-glow"></div>
+    <div class="eyebrow">The Problem</div>
+    <h2>The Gap Between You<br>and a Doctor <em style="font-style:normal; color:var(--danger);">Is Dangerous</em></h2>
+    <div class="two-col" style="margin-top: 28px;">
+      <div>
+        <ul class="bullets" style="margin-top: 0;">
+          <li><strong>75% of India's doctors</strong> concentrated in cities holding 31% of the population</li>
+          <li>Average wait for a specialist: <strong>3–4 weeks</strong> — by then, conditions escalate</li>
+          <li><strong>68% of patients</strong> arrive unable to accurately describe their symptom history</li>
+          <li>Lab reports come back as jargon-filled PDFs — patients ignore flags or spiral into <strong>Google dread</strong></li>
+          <li>Medical information in India is almost entirely in <strong>English</strong> — for a population that largely isn't</li>
+        </ul>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px; padding-top: 4px;">
+        <div class="stat-box" style="margin-top: 0;">
+          <div class="stat-num">1 : 1,457</div>
+          <div class="stat-label">Doctor to patient ratio in India<br><span style="color: rgba(122,122,110,0.6); font-size: 11px;">IMA — 2024</span></div>
+        </div>
+        <div class="stat-box" style="background: rgba(217,114,114,0.06); border-color: rgba(217,114,114,0.15);">
+          <div class="stat-num" style="color: var(--danger);">600K</div>
+          <div class="stat-label">Doctor shortage projected by 2030<br><span style="color: rgba(122,122,110,0.6); font-size: 11px;">WHO South-East Asia Region</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: SOLUTION -->
+  <div class="slide" data-index="2">
+    <div class="hero-glow"></div>
+    <div class="eyebrow">Introducing Praana</div>
+    <h2>A <span class="gradient-text">Health System</span><br>in Your Pocket</h2>
+    <p class="hook" style="max-width: 600px;">Not a doctor replacement. A <strong>doctor-level preparation tool</strong> — for every Indian, in every language.</p>
+    <ul class="bullets">
+      <li><strong>Describe symptoms</strong> in voice or text → AI cross-references ICD-11 (WHO) → ranked condition shortlist with urgency</li>
+      <li><strong>Upload anything</strong> — lab report, X-ray, skin photo, food label, medication — instant plain-language AI analysis</li>
+      <li><strong>Log daily</strong> — vitals, meals, exercise → anomaly detection, 7-day trend tracking, Indian nutrition data (IFCT 2017)</li>
+      <li><strong>Profile-aware</strong> — every analysis talks to your blood type, conditions, medications, and allergies</li>
+      <li><strong>Doctor Brief</strong> — one-tap PDF summary that makes every consultation 10× more productive</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 4: AI SYMPTOM ANALYSIS -->
+  <div class="slide" data-index="3">
+    <div class="hero-glow-2"></div>
+    <div class="eyebrow">Feature 01</div>
+    <h2>From "Something Feels Off"<br>to <span class="gradient-text">Ranked Answers</span></h2>
+    <div class="stat-box" style="margin-top: 20px; background: rgba(128,144,208,0.06); border-color: rgba(128,144,208,0.15);">
+      <div class="stat-num" style="color: var(--blue); font-size: 22px; font-weight: 700; font-family: 'DM Sans', sans-serif;">ICD-11 Grounded</div>
+      <div class="stat-label">The same disease classification system used by WHO and 115 countries worldwide</div>
+    </div>
+    <ul class="bullets">
+      <li>Speak or type symptoms in <strong>Hindi, Tamil, or English</strong> — Praana understands all three</li>
+      <li>AI maps to ICD-11 and returns a ranked shortlist: <span class="tag badge-danger">Emergency</span><span class="tag badge-gold">See GP Soon</span><span class="tag badge-sage">Self-Monitor</span></li>
+      <li>Each result shows: <strong>what to watch for</strong>, and exact <strong>questions to ask your doctor</strong></li>
+      <li>Voice input via Web Speech API — works fully in-browser, no external service needed</li>
+      <li><strong>Red Flag Detection</strong> — emergency symptoms trigger an instant 112 call screen, no delay</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 5: SCAN & ANALYSE -->
+  <div class="slide" data-index="4">
+    <div class="hero-glow"></div>
+    <div class="eyebrow">Feature 02</div>
+    <h2>Your Camera Becomes<br>a <span class="gradient-text">Medical Interpreter</span></h2>
+    <p style="color: var(--muted); font-size: 16px; margin-top: 12px; margin-bottom: 8px;">"A lab report should not require a medical degree to read."</p>
+    <div class="feature-grid">
+      <div class="feature-card" style="border-color: rgba(143,191,110,0.2);">
+        <div class="fc-icon">🔬</div>
+        <div class="fc-title" style="color: var(--sage);">Lab Report</div>
+        <div class="fc-desc">Extracts every value, flags out-of-range results, explains what each flag means in plain language. PDF and image supported.</div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(128,144,208,0.2);">
+        <div class="fc-icon">🩻</div>
+        <div class="fc-title" style="color: var(--blue);">X-Ray Analysis</div>
+        <div class="fc-desc">AI density analysis, pattern recognition, structured findings — cross-referenced with your respiratory/cardiac history.</div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(224,144,80,0.2);">
+        <div class="fc-icon">📸</div>
+        <div class="fc-title" style="color: var(--orange);">Skin Check</div>
+        <div class="fc-desc">Upload a photo, get condition likelihood assessment with self-care vs GP urgency guidance.</div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(176,128,208,0.2);">
+        <div class="fc-icon">🍱</div>
+        <div class="fc-title" style="color: var(--purple);">Food Label Scanner</div>
+        <div class="fc-desc">Ingredient safety score (A–D), allergen flag against your profile, additive warnings.</div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(201,168,76,0.2);">
+        <div class="fc-icon">💊</div>
+        <div class="fc-title" style="color: var(--gold);">Medicine Scanner</div>
+        <div class="fc-desc">Drug interaction check against your current medications. Dosage and contraindication notes.</div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(80,200,176,0.2); background: rgba(80,200,176,0.04);">
+        <div class="fc-icon">🛡️</div>
+        <div class="fc-title" style="color: var(--teal);">Profile-Aware</div>
+        <div class="fc-desc">Every scan checks against your blood type, conditions, medications, and allergies. No generic answers.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: VITALS + DIET + WELLNESS -->
+  <div class="slide" data-index="5">
+    <div class="hero-glow-2"></div>
+    <div class="eyebrow">Feature 03</div>
+    <h2>Daily Habits, Tracked Against<br><span class="gradient-text">What Your Body Needs</span></h2>
+    <div class="two-col">
+      <div>
+        <ul class="bullets" style="margin-top: 16px;">
+          <li>Log <strong>HR, BP, SpO2, temp, weight</strong> → 7-day sparklines + anomaly alerts</li>
+          <li>Diet log uses <strong>IFCT 2017</strong> — India's national food database. Idli, dal, roti are first-class entries, not afterthoughts</li>
+          <li>Nutritional gaps surfaced against your age, weight, conditions, activity</li>
+          <li><strong>Exercise + Yoga</strong> recommendations calibrated to your specific health conditions</li>
+          <li><strong>Ayurvedic herbs</strong> database with personalised remedy suggestions tied to your symptoms</li>
+        </ul>
+      </div>
+      <div style="padding-top: 16px;">
+        <div class="stat-box" style="background: rgba(80,200,176,0.06); border-color: rgba(80,200,176,0.15); width: 100%;">
+          <div class="stat-num" style="color: var(--teal);">IFCT 2017</div>
+          <div class="stat-label">India's national food composition database — <strong style="color: var(--ivory);">the most comprehensive Indian food dataset available</strong>. Praana is one of the first health apps to integrate it.</div>
+        </div>
+        <div class="stat-box" style="background: rgba(143,191,110,0.06); border-color: rgba(143,191,110,0.15); width: 100%; margin-top: 12px;">
+          <div class="stat-num" style="color: var(--sage); font-size: 18px; font-family: 'DM Sans'; font-weight: 600;">Anomaly Detection</div>
+          <div class="stat-label">Automatic alerts when 7-day trends deviate from your personal baseline — not population averages.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: DOCTOR BRIEF -->
+  <div class="slide" data-index="6">
+    <div class="hero-glow"></div>
+    <div class="eyebrow">Feature 04 — Killer Feature</div>
+    <h2>The <span class="gradient-text">Doctor Brief</span><br>Changes Every Consultation</h2>
+    <p class="hook" style="font-size: 18px; margin-top: 14px;">
+      <strong>Average Indian GP consultation: 2 minutes.</strong><br>Praana makes those 2 minutes count.
+    </p>
+    <ul class="bullets">
+      <li>One-tap PDF: <strong>symptom timeline, lab flags, vitals trend, medications, allergies, current concerns</strong> — in clean clinical language</li>
+      <li>Doctor spends zero time extracting history — <strong>all their time goes to diagnosis</strong></li>
+      <li>Sharable via <strong>WhatsApp, email, or print</strong> — works in every clinic, no app on the doctor's side needed</li>
+      <li>Powered by Claude AI writing structured medical summaries from your entire health history</li>
+      <li>Especially powerful for <strong>specialist referrals, second opinions</strong>, and chronic condition management</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 8: TECH STACK -->
+  <div class="slide" data-index="7">
+    <div class="hero-glow-2"></div>
+    <div class="eyebrow">Tech Architecture</div>
+    <h2>Built on <span class="gradient-text">Trusted Infrastructure</span></h2>
+    <p style="color: var(--muted); font-size: 15px; margin-top: 8px; margin-bottom: 24px;">Every layer chosen for reliability, not novelty.</p>
+    <div style="display: flex; gap: 48px; align-items: flex-start; flex-wrap: wrap;">
+      <div>
+        <div style="display: flex; flex-direction: column; gap: 10px; max-width: 400px;">
+          <div class="arch-row">
+            <div class="arch-node" style="background: rgba(128,144,208,0.12); color: var(--blue); border: 1px solid rgba(128,144,208,0.2);">🌐 React + TypeScript</div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="background: rgba(143,191,110,0.08); color: var(--muted); font-size: 12px; border: 1px solid rgba(255,255,255,0.05);">Frontend / Vercel</div>
+          </div>
+          <div class="arch-divider"></div>
+          <div class="arch-row">
+            <div class="arch-node" style="background: rgba(80,200,176,0.12); color: var(--teal); border: 1px solid rgba(80,200,176,0.2);">⚡ FastAPI (Python)</div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="background: rgba(143,191,110,0.08); color: var(--muted); font-size: 12px; border: 1px solid rgba(255,255,255,0.05);">Backend / Render</div>
+          </div>
+          <div class="arch-divider"></div>
+          <div class="arch-row">
+            <div class="arch-node" style="background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.2);">🧠 Claude Sonnet</div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="background: rgba(143,191,110,0.08); color: var(--muted); font-size: 12px; border: 1px solid rgba(255,255,255,0.05);">AI Reasoning Core</div>
+          </div>
+          <div class="arch-divider"></div>
+          <div class="arch-row">
+            <div class="arch-node" style="background: rgba(143,191,110,0.12); color: var(--sage); border: 1px solid rgba(143,191,110,0.2);">🍃 MongoDB Atlas</div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="background: rgba(143,191,110,0.08); color: var(--muted); font-size: 12px; border: 1px solid rgba(255,255,255,0.05);">Health Data Store</div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="stat-box" style="margin-top: 0; background: rgba(128,144,208,0.06); border-color: rgba(128,144,208,0.15);">
+          <div class="stat-num" style="color: var(--blue); font-size: 16px; font-family: 'DM Sans'; font-weight: 600;">ICD-11 WHO API</div>
+          <div class="stat-label">Live disease classification database</div>
+        </div>
+        <div class="stat-box" style="margin-top: 0; background: rgba(80,200,176,0.06); border-color: rgba(80,200,176,0.15);">
+          <div class="stat-num" style="color: var(--teal); font-size: 16px; font-family: 'DM Sans'; font-weight: 600;">IFCT 2017</div>
+          <div class="stat-label">Indian national food composition data</div>
+        </div>
+        <div class="stat-box" style="margin-top: 0; background: rgba(176,128,208,0.06); border-color: rgba(176,128,208,0.15);">
+          <div class="stat-num" style="color: var(--purple); font-size: 16px; font-family: 'DM Sans'; font-weight: 600;">ReportLab + Recharts</div>
+          <div class="stat-label">PDF generation + data visualisation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: WHY NOW / IMPACT -->
+  <div class="slide" data-index="8">
+    <div class="hero-glow"></div>
+    <div class="eyebrow">Why Now</div>
+    <h2>The Infrastructure Is Ready.<br><span class="gradient-text">The Problem Has Been Waiting 20 Years.</span></h2>
+    <div class="two-col">
+      <ul class="bullets" style="margin-top: 20px;">
+        <li><strong>700M+ smartphones</strong> in India — the delivery channel exists at scale</li>
+        <li>UPI proved India can adopt complex digital tools fast — <strong>Praana is the health equivalent</strong></li>
+        <li>No existing app combines symptom analysis + scan interpretation + Indian diet + Doctor Brief in <strong>one profile-aware system, in Hindi and Tamil</strong></li>
+        <li>ICD-11 + IFCT grounding gives Praana <strong>clinical credibility</strong> generic AI health apps cannot match</li>
+      </ul>
+      <div style="padding-top: 20px;">
+        <div class="big-quote">"Generic AI health apps give generic answers. <em>Praana knows your blood type, your medications, your language, and your food.</em>"</div>
+        <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px;">
+          <span class="badge badge-sage">Tier-2 &amp; Tier-3 India</span>
+          <span class="badge badge-gold">Chronic Condition Patients</span>
+          <span class="badge badge-blue">Elderly + Families</span>
+          <span class="badge badge-teal">First-Gen Smartphone Users</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: THANK YOU -->
+  <div class="slide" data-index="9">
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+    <div class="eyebrow">CBC Spring 2026 · Track 1: Biology &amp; Physical Health</div>
+    <h1 style="margin-bottom: 8px;"><span class="gradient-text">Praana</span></h1>
+    <p class="big-quote" style="margin-top: 8px; font-size: clamp(16px, 2vw, 26px); font-weight: 600;">
+      "We didn't build a chatbot.<br>We built the health companion <em>1.4 billion people have never had</em> —<br>in the language they actually speak."
+    </p>
+    <div style="margin-top: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 700px;">
+      <div class="stat-box" style="margin-top: 0;">
+        <div class="stat-num" style="font-size: 14px; font-family: 'DM Sans'; font-weight: 700; color: var(--ivory); margin-bottom: 8px;">🛠 Stack</div>
+        <div class="stat-label">React · FastAPI · Claude Sonnet · MongoDB Atlas · ICD-11 · IFCT 2017</div>
+      </div>
+      <div class="stat-box" style="margin-top: 0; background: rgba(128,144,208,0.06); border-color: rgba(128,144,208,0.15);">
+        <div class="stat-num" style="font-size: 14px; font-family: 'DM Sans'; font-weight: 700; color: var(--ivory); margin-bottom: 8px;">📬 Contact</div>
+        <div class="stat-label">23f2004188@ds.study.iitm.ac.in<br>IIT Madras — B.S. Data Science</div>
+      </div>
+    </div>
+    <p style="margin-top: 24px; font-size: 13px; color: rgba(143,191,110,0.45);">Live demo available — try symptom analysis, scan a lab report, generate a Doctor Brief</p>
+  </div>
+
+</div>
+
+<nav class="nav">
+  <button id="prevBtn" onclick="changeSlide(-1)">←</button>
+  <span class="slide-counter" id="counter">1 / 10</span>
+  <button id="nextBtn" onclick="changeSlide(1)">→</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide')
+  const counter = document.getElementById('counter')
+  const progressBar = document.getElementById('progressBar')
+  const slideLabel = document.getElementById('slideLabel')
+  const LABELS = [
+    'Hero', 'The Problem', 'Solution', 'AI Symptoms',
+    'Scan & Analyse', 'Vitals & Diet', 'Doctor Brief',
+    'Tech Stack', 'Why Now', 'Thank You'
+  ]
+
+  let current = 0
+
+  function updateUI() {
+    counter.textContent = `${current + 1} / ${slides.length}`
+    progressBar.style.width = `${((current + 1) / slides.length) * 100}%`
+    slideLabel.textContent = LABELS[current] || 'CBC Spring 2026'
+  }
+
+  function changeSlide(dir) {
+    const next = current + dir
+    if (next < 0 || next >= slides.length) return
+
+    slides[current].classList.remove('active')
+    slides[current].classList.add('exit')
+    setTimeout(() => slides[current - dir >= 0 ? current - dir : 0].classList.remove('exit'), 400)
+
+    current = next
+    slides[current].classList.add('active')
+    updateUI()
+
+    // Remove exit class from old slide after animation
+    setTimeout(() => {
+      slides.forEach((s, i) => { if (i !== current) { s.classList.remove('active', 'exit') } })
+    }, 400)
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); changeSlide(1) }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); changeSlide(-1) }
+  })
+
+  updateUI()
+</script>
+
+</body>
+</html>

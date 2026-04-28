@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from ..db.connection import get_db
 from ..db.queries import get_user_by_email, create_user
@@ -19,6 +20,7 @@ async def register(body: UserRegister, db=Depends(get_db)):
         'email': body.email,
         'password_hash': hash_password(body.password),
         'name': body.name,
+        'created_at': datetime.now(timezone.utc),
     })
     token = create_access_token({'sub': user_id})
     return {'access_token': token, 'token_type': 'bearer', 'user_id': user_id}

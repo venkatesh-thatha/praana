@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .db.connection import connect_db, disconnect_db, get_db
 from .db.indexes import create_indexes
-from .routers import auth, profile, symptoms, scanner, diet, vitals, exercise, brief, sessions
+from .routers import auth, profile, symptoms, scanner, diet, vitals, exercise, brief, sessions, lab_report, wellness, skin, xray, herbs
 
 
 @asynccontextmanager
@@ -28,8 +28,8 @@ settings = get_settings()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url, 'http://localhost:5173', 'http://localhost:3000'],
-    allow_credentials=True,
+    allow_origins=['*'],
+    allow_credentials=False,
     allow_methods=['*'],
     allow_headers=['*'],
 )
@@ -43,6 +43,11 @@ app.include_router(vitals.router, prefix='/api/vitals', tags=['vitals'])
 app.include_router(exercise.router, prefix='/api/exercise', tags=['exercise'])
 app.include_router(brief.router, prefix='/api/brief', tags=['brief'])
 app.include_router(sessions.router, prefix='/api/symptoms', tags=['symptoms'])
+app.include_router(lab_report.router, prefix='/api/lab-report', tags=['lab-report'])
+app.include_router(wellness.router, prefix='/api/wellness', tags=['wellness'])
+app.include_router(skin.router, prefix='/api/skin', tags=['skin'])
+app.include_router(xray.router, prefix='/api/xray', tags=['xray'])
+app.include_router(herbs.router, prefix='/api/herbs', tags=['herbs'])
 
 
 @app.get('/health')

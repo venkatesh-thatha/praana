@@ -25,17 +25,18 @@ interface ScanResult {
   critical_warnings: string[]
 }
 
-const SCORE_STYLE: Record<string, { bg: string; text: string; border: string }> = {
-  A: { bg: 'bg-green-500', text: 'text-white', border: 'border-green-400' },
-  B: { bg: 'bg-yellow-500', text: 'text-white', border: 'border-yellow-400' },
-  C: { bg: 'bg-orange-500', text: 'text-white', border: 'border-orange-400' },
-  D: { bg: 'bg-red-500', text: 'text-white', border: 'border-red-400' },
+// Score badge uses design token colors — not Tailwind green/yellow/orange/red
+const SCORE_STYLE: Record<string, { background: string; color: string; border: string }> = {
+  A: { background: 'rgba(143,191,110,0.2)', color: '#8fbf6e', border: '2px solid rgba(143,191,110,0.5)' },
+  B: { background: 'rgba(201,168,76,0.2)', color: '#c9a84c', border: '2px solid rgba(201,168,76,0.5)' },
+  C: { background: 'rgba(224,128,64,0.2)', color: '#e08040', border: '2px solid rgba(224,128,64,0.5)' },
+  D: { background: 'rgba(217,114,114,0.2)', color: '#d97272', border: '2px solid rgba(217,114,114,0.5)' },
 }
 
 const SAFETY_ICON: Record<string, JSX.Element> = {
-  safe: <CheckCircle className='text-green-400 shrink-0' size={16} />,
-  caution: <AlertCircle className='text-amber-400 shrink-0' size={16} />,
-  avoid: <XCircle className='text-red-400 shrink-0' size={16} />,
+  safe: <CheckCircle size={16} style={{ color: '#8fbf6e', flexShrink: 0 }} />,
+  caution: <AlertCircle size={16} style={{ color: '#c9a84c', flexShrink: 0 }} />,
+  avoid: <XCircle size={16} style={{ color: '#d97272', flexShrink: 0 }} />,
 }
 
 export default function ScannerPage() {
@@ -79,19 +80,31 @@ export default function ScannerPage() {
     <Layout>
       <div className='max-w-2xl mx-auto px-4 py-8'>
         <div className='flex items-center gap-3 mb-6'>
-          <Camera className='text-purple-400' size={24} />
-          <h1 className='text-2xl font-bold text-white'>Label Scanner</h1>
+          {/* Purple matches Dashboard module card icon color */}
+          <Camera size={24} style={{ color: '#b080d0' }} />
+          <h1 className='text-2xl font-bold' style={{ color: '#ede9e0' }}>Label Scanner</h1>
         </div>
 
-        {/* Mode toggle */}
+        {/* Mode toggle — active uses purple tint to match page icon accent */}
         <div className='flex gap-2 mb-6'>
           {(['food', 'medicine'] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => { setScanMode(mode); setResult(null); setPreview(null) }}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors capitalize ${
-                scanMode === mode ? 'bg-purple-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-              }`}
+              className='flex-1 py-2.5 rounded-lg text-sm font-medium transition-all capitalize'
+              style={
+                scanMode === mode
+                  ? {
+                      background: 'rgba(176,128,208,0.2)',
+                      border: '1px solid rgba(176,128,208,0.4)',
+                      color: '#c0a0e0',
+                    }
+                  : {
+                      background: 'transparent',
+                      border: '1px solid rgba(143,191,110,0.25)',
+                      color: '#7a7a6e',
+                    }
+              }
             >
               {mode} label
             </button>
@@ -101,16 +114,19 @@ export default function ScannerPage() {
         {/* Upload area */}
         <div className='card mb-6'>
           <div
-            className='border-2 border-dashed border-slate-600 rounded-xl p-8 text-center cursor-pointer hover:border-purple-500 transition-colors'
+            className='rounded-xl p-8 text-center cursor-pointer transition-all'
+            style={{ border: '1px dashed rgba(143,191,110,0.2)' }}
             onClick={() => fileRef.current?.click()}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(143,191,110,0.35)')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(143,191,110,0.2)')}
           >
             {preview ? (
               <img src={preview} alt='Label preview' className='max-h-48 mx-auto rounded-lg object-contain' />
             ) : (
               <>
-                <Upload className='text-slate-400 mx-auto mb-3' size={40} />
-                <p className='text-slate-300 font-medium'>Upload {scanMode} label image</p>
-                <p className='text-slate-500 text-sm mt-1'>JPEG, PNG, WEBP · max 5MB</p>
+                <Upload size={40} className='mx-auto mb-3' style={{ color: '#7a7a6e' }} />
+                <p className='font-medium' style={{ color: '#ede9e0' }}>Upload {scanMode} label image</p>
+                <p className='text-sm mt-1' style={{ color: '#7a7a6e' }}>JPEG, PNG, WEBP · max 5MB</p>
               </>
             )}
           </div>
@@ -135,19 +151,23 @@ export default function ScannerPage() {
 
         {/* Error card */}
         {apiError && (
-          <div className='mb-4 p-4 bg-red-900/30 border border-red-700/50 rounded-xl'>
-            <p className='text-sm font-medium text-red-300 mb-1'>Scan failed</p>
-            <p className='text-xs text-red-200'>{apiError}</p>
-            <p className='text-xs text-slate-400 mt-2'>Make sure the label is clearly visible and well-lit. Try uploading a clearer photo.</p>
+          <div className='mb-4 p-4 rounded-xl' style={{ background: 'rgba(217,114,114,0.08)', border: '1px solid rgba(217,114,114,0.25)' }}>
+            <p className='text-sm font-medium mb-1' style={{ color: '#d97272' }}>Scan failed</p>
+            <p className='text-xs' style={{ color: '#f0a0a0' }}>{apiError}</p>
+            <p className='text-xs mt-2' style={{ color: '#7a7a6e' }}>Make sure the label is clearly visible and well-lit. Try uploading a clearer photo.</p>
           </div>
         )}
 
         {/* Loading */}
         {loading && (
           <div className='card text-center py-8'>
-            <div className='w-8 h-8 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin mx-auto mb-3' />
-            <p className='text-slate-300'>Analysing ingredients with AI...</p>
-            <p className='text-slate-500 text-xs mt-1'>Checking against your health profile</p>
+            {/* Spinner uses purple accent to match the page icon */}
+            <div
+              className='w-8 h-8 border-2 rounded-full animate-spin mx-auto mb-3'
+              style={{ borderColor: 'rgba(176,128,208,0.2)', borderTopColor: '#b080d0' }}
+            />
+            <p style={{ color: '#b8d99c' }}>Analysing ingredients with AI...</p>
+            <p className='text-xs mt-1' style={{ color: '#7a7a6e' }}>Checking against your health profile</p>
           </div>
         )}
 
@@ -156,52 +176,66 @@ export default function ScannerPage() {
           <div className='space-y-4'>
             {/* Score card */}
             <div className='card flex items-center gap-4'>
-              <div className={`w-16 h-16 rounded-xl ${SCORE_STYLE[result.overall_score].bg} flex items-center justify-center shrink-0`}>
-                <span className='text-3xl font-bold text-white'>{result.overall_score}</span>
+              <div
+                className='w-16 h-16 rounded-xl flex items-center justify-center shrink-0'
+                style={{
+                  background: SCORE_STYLE[result.overall_score].background,
+                  border: SCORE_STYLE[result.overall_score].border,
+                }}
+              >
+                <span className='text-3xl font-bold' style={{ color: SCORE_STYLE[result.overall_score].color }}>
+                  {result.overall_score}
+                </span>
               </div>
               <div>
-                {result.product_name && <p className='font-semibold text-white'>{result.product_name}</p>}
-                <p className='text-sm text-slate-300'>{result.score_explanation}</p>
+                {result.product_name && (
+                  <p className='font-semibold' style={{ color: '#ede9e0' }}>{result.product_name}</p>
+                )}
+                <p className='text-sm' style={{ color: '#b8d99c' }}>{result.score_explanation}</p>
               </div>
             </div>
 
             {/* Critical warnings */}
             {result.critical_warnings?.length > 0 && (
-              <div className='p-4 bg-red-900/30 border border-red-700/50 rounded-xl'>
+              <div className='p-4 rounded-xl' style={{ background: 'rgba(217,114,114,0.08)', border: '1px solid rgba(217,114,114,0.25)' }}>
                 {result.critical_warnings.map((w, i) => (
                   <div key={i} className='flex gap-2 items-start'>
-                    <AlertTriangle className='text-red-400 shrink-0 mt-0.5' size={14} />
-                    <p className='text-sm text-red-200'>{w}</p>
+                    <AlertTriangle size={14} className='mt-0.5 shrink-0' style={{ color: '#d97272' }} />
+                    <p className='text-sm' style={{ color: '#f0a0a0' }}>{w}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Drug interactions */}
+            {/* Drug interactions — gold banner */}
             {result.drug_interactions?.length > 0 && (
-              <div className='p-4 bg-orange-900/30 border border-orange-700/50 rounded-xl'>
-                <p className='text-sm font-medium text-orange-300 mb-2'>Drug Interaction Alerts</p>
+              <div className='p-4 rounded-xl' style={{ background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)' }}>
+                <p className='text-sm font-medium mb-2' style={{ color: '#c9a84c' }}>Drug Interaction Alerts</p>
                 {result.drug_interactions.map((w, i) => (
-                  <p key={i} className='text-sm text-orange-200'>• {w}</p>
+                  <p key={i} className='text-sm' style={{ color: '#e0c878' }}>• {w}</p>
                 ))}
               </div>
             )}
 
             {/* Ingredients */}
             <div className='card'>
-              <h3 className='font-semibold text-white mb-3'>Ingredient Analysis</h3>
+              <h3 className='font-semibold mb-3' style={{ color: '#ede9e0' }}>Ingredient Analysis</h3>
               <div className='space-y-3'>
                 {result.ingredients.map((ing, i) => (
-                  <div key={i} className='flex gap-3 py-2 border-b border-slate-700/50 last:border-0'>
+                  <div
+                    key={i}
+                    className='flex gap-3 py-2 last:border-0'
+                    style={{ borderBottom: '1px solid rgba(143,191,110,0.08)' }}
+                  >
                     {SAFETY_ICON[ing.safety_level]}
                     <div className='flex-1 min-w-0'>
                       <div className='flex items-center justify-between gap-2'>
-                        <p className='text-sm font-medium text-white'>{ing.ingredient_name}</p>
-                        <span className='text-xs text-slate-500 shrink-0'>{ing.category}</span>
+                        <p className='text-sm font-medium' style={{ color: '#ede9e0' }}>{ing.ingredient_name}</p>
+                        <span className='text-xs shrink-0' style={{ color: '#7a7a6e' }}>{ing.category}</span>
                       </div>
-                      <p className='text-xs text-slate-400 mt-0.5'>{ing.effect_on_body}</p>
+                      <p className='text-xs mt-0.5' style={{ color: '#7a7a6e' }}>{ing.effect_on_body}</p>
                       {ing.profile_interaction && ing.interaction_detail && (
-                        <p className='text-xs text-amber-300 mt-1 flex items-center gap-1'>
+                        <p className='text-xs mt-1 flex items-center gap-1' style={{ color: '#c9a84c' }}>
                           <AlertTriangle size={10} /> {ing.interaction_detail}
                         </p>
                       )}

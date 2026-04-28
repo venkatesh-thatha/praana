@@ -34,10 +34,11 @@ const METRIC_LABELS: Record<string, { label: string; unit: string }> = {
   weight_kg: { label: 'Weight', unit: 'kg' },
 }
 
+// TrendIcon colors match design tokens: rising = danger, falling = soft blue, stable = muted
 const TrendIcon = ({ dir }: { dir: string }) => {
-  if (dir === 'rising') return <TrendingUp className='text-red-400' size={14} />
-  if (dir === 'falling') return <TrendingDown className='text-blue-400' size={14} />
-  return <Minus className='text-slate-400' size={14} />
+  if (dir === 'rising') return <TrendingUp size={14} style={{ color: '#d97272' }} />
+  if (dir === 'falling') return <TrendingDown size={14} style={{ color: '#8090d0' }} />
+  return <Minus size={14} style={{ color: '#7a7a6e' }} />
 }
 
 /** Extract the last N readings for a given metric from history, formatted for Recharts */
@@ -48,12 +49,12 @@ function buildSparklineData(history: VitalsHistoryEntry[], metric: string, n = 7
     .map((h, i) => ({ i, value: h[metric] as number }))
 }
 
-/** Determine sparkline stroke color based on anomaly flag */
+/** Determine sparkline stroke color based on anomaly flag and trend direction */
 function sparklineColor(anomaly: boolean, dir: string) {
-  if (anomaly) return '#f59e0b' // amber
-  if (dir === 'rising') return '#f87171' // red-400
-  if (dir === 'falling') return '#60a5fa' // blue-400
-  return '#34d399' // teal-400
+  if (anomaly) return '#f59e0b'  // amber — unchanged
+  if (dir === 'rising') return '#d97272'   // danger red
+  if (dir === 'falling') return '#8090d0'  // soft blue
+  return '#8fbf6e'               // sage — replaces old teal #34d399
 }
 
 export default function VitalsPage() {
@@ -112,13 +113,14 @@ export default function VitalsPage() {
     <Layout>
       <div className='max-w-2xl mx-auto px-4 py-8'>
         <div className='flex items-center gap-3 mb-6'>
-          <Activity className='text-red-400' size={24} />
-          <h1 className='text-2xl font-bold text-white'>Vitals Tracker</h1>
+          {/* Teal-green matches Dashboard module card icon color */}
+          <Activity size={24} style={{ color: '#50c8b0' }} />
+          <h1 className='text-2xl font-bold' style={{ color: '#ede9e0' }}>Vitals Tracker</h1>
         </div>
 
         {/* Log form */}
         <div className='card mb-6'>
-          <h2 className='font-semibold text-white mb-4'>Log today's vitals</h2>
+          <h2 className='font-semibold mb-4' style={{ color: '#ede9e0' }}>Log today's vitals</h2>
           <div className='grid grid-cols-2 gap-3 mb-4'>
             {Object.entries(METRIC_LABELS).map(([key, { label, unit }]) => (
               <div key={key}>
@@ -138,16 +140,20 @@ export default function VitalsPage() {
           </button>
         </div>
 
-        {/* Constellation alerts */}
+        {/* Constellation alerts — amber/gold styling kept as is, already correct */}
         {constellations.length > 0 && (
           <div className='space-y-2 mb-4'>
             {constellations.map((c, i) => (
-              <div key={i} className='p-4 bg-amber-900/30 border border-amber-700/50 rounded-xl flex gap-3'>
-                <AlertTriangle className='text-amber-400 shrink-0 mt-0.5' size={16} />
+              <div
+                key={i}
+                className='p-4 rounded-xl flex gap-3'
+                style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)' }}
+              >
+                <AlertTriangle size={16} className='shrink-0 mt-0.5' style={{ color: '#c9a84c' }} />
                 <div>
-                  <p className='text-sm font-medium text-amber-300'>{c.pattern_name?.replace(/_/g, ' ')}</p>
-                  <p className='text-xs text-amber-200 mt-0.5'>{c.clinical_significance}</p>
-                  <p className='text-xs text-amber-300/80 mt-1 font-medium'>{c.action}</p>
+                  <p className='text-sm font-medium' style={{ color: '#c9a84c' }}>{c.pattern_name?.replace(/_/g, ' ')}</p>
+                  <p className='text-xs mt-0.5' style={{ color: '#e0c878' }}>{c.clinical_significance}</p>
+                  <p className='text-xs mt-1 font-medium' style={{ color: 'rgba(201,168,76,0.8)' }}>{c.action}</p>
                 </div>
               </div>
             ))}
@@ -157,7 +163,11 @@ export default function VitalsPage() {
         {/* Trends + Sparklines */}
         {analysisLoading ? (
           <div className='card text-center py-6'>
-            <div className='w-6 h-6 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin mx-auto' />
+            {/* Spinner uses teal accent to match the page icon */}
+            <div
+              className='w-6 h-6 border-2 rounded-full animate-spin mx-auto'
+              style={{ borderColor: 'rgba(80,200,176,0.2)', borderTopColor: '#50c8b0' }}
+            />
           </div>
         ) : trends.length > 0 ? (
           <div className='grid grid-cols-2 gap-3'>
@@ -166,19 +176,25 @@ export default function VitalsPage() {
               const sparkData = buildSparklineData(history, t.metric, 7)
               const color = sparklineColor(t.anomaly, t.trend_direction)
               return (
-                <div key={t.metric} className={`card ${t.anomaly ? 'border-amber-700/60' : 'border-slate-600'}`}>
+                <div
+                  key={t.metric}
+                  className='card card-hover'
+                  style={t.anomaly ? { borderColor: 'rgba(201,168,76,0.4)' } : {}}
+                >
                   <div className='flex items-center justify-between mb-1'>
-                    <p className='text-xs text-slate-400'>{meta?.label || t.metric}</p>
+                    <p className='text-xs' style={{ color: '#7a7a6e' }}>{meta?.label || t.metric}</p>
                     <TrendIcon dir={t.trend_direction} />
                   </div>
-                  <p className='text-2xl font-bold text-white'>
+                  <p className='text-2xl font-bold' style={{ color: '#ede9e0' }}>
                     {t.average_7d}
-                    <span className='text-sm text-slate-400 font-normal ml-1'>{meta?.unit}</span>
+                    <span className='text-sm font-normal ml-1' style={{ color: '#7a7a6e' }}>{meta?.unit}</span>
                   </p>
-                  <p className='text-xs text-slate-500 mt-1'>
+                  <p className='text-xs mt-1' style={{ color: '#7a7a6e' }}>
                     7-day avg{t.baseline ? ` · baseline: ${t.baseline}` : ''}
                   </p>
-                  {t.anomaly && <p className='text-xs text-amber-400 mt-1'>deviation from baseline</p>}
+                  {t.anomaly && (
+                    <p className='text-xs mt-1' style={{ color: '#f59e0b' }}>deviation from baseline</p>
+                  )}
 
                   {/* Sparkline — shows last 7 readings */}
                   {sparkData.length >= 2 && (
@@ -186,7 +202,7 @@ export default function VitalsPage() {
                       <ResponsiveContainer width='100%' height={48}>
                         <LineChart data={sparkData}>
                           <Tooltip
-                            contentStyle={{ background: '#1e293b', border: 'none', borderRadius: 6, fontSize: 11 }}
+                            contentStyle={{ background: 'rgba(22,26,22,0.95)', border: '1px solid rgba(143,191,110,0.15)', borderRadius: 6, fontSize: 11 }}
                             formatter={(v: number) => [`${v} ${meta?.unit}`, meta?.label]}
                             labelFormatter={() => ''}
                           />
@@ -203,7 +219,7 @@ export default function VitalsPage() {
                     </div>
                   )}
                   {sparkData.length < 2 && (
-                    <p className='text-xs text-slate-600 mt-2'>Log more readings to see trend</p>
+                    <p className='text-xs mt-2' style={{ color: 'rgba(122,122,110,0.5)' }}>Log more readings to see trend</p>
                   )}
                 </div>
               )
@@ -211,27 +227,29 @@ export default function VitalsPage() {
           </div>
         ) : (
           <div className='card text-center py-8'>
-            <Activity className='text-slate-600 mx-auto mb-2' size={32} />
-            <p className='text-slate-400 text-sm'>No vitals logged yet. Log your first entry above.</p>
+            {/* Empty state icon uses sage tint */}
+            <Activity size={32} className='mx-auto mb-2' style={{ color: 'rgba(143,191,110,0.3)' }} />
+            <p className='text-sm' style={{ color: '#7a7a6e' }}>No vitals logged yet. Log your first entry above.</p>
           </div>
         )}
 
         {/* AI Alert details */}
         {alerts.length > 0 && (
           <div className='mt-4 space-y-2'>
-            <h3 className='text-sm font-semibold text-slate-300 mb-2'>AI Pattern Analysis</h3>
+            <h3 className='text-sm font-semibold mb-2' style={{ color: '#ede9e0' }}>AI Pattern Analysis</h3>
             {alerts
               .filter((a) => a.concern_level !== 'normal')
               .map((a, i) => (
                 <div
                   key={i}
-                  className={`p-3 rounded-lg border text-xs ${
+                  className='p-3 rounded-lg border text-xs'
+                  style={
                     a.concern_level === 'urgent'
-                      ? 'bg-red-900/30 border-red-700/50 text-red-200'
+                      ? { background: 'rgba(217,114,114,0.08)', border: '1px solid rgba(217,114,114,0.25)', color: '#f0a0a0' }
                       : a.concern_level === 'concern'
-                      ? 'bg-amber-900/30 border-amber-700/50 text-amber-200'
-                      : 'bg-slate-800 border-slate-700 text-slate-300'
-                  }`}
+                      ? { background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', color: '#e0c878' }
+                      : { background: 'rgba(16,20,18,0.8)', border: '1px solid rgba(143,191,110,0.1)', color: '#b8d99c' }
+                  }
                 >
                   <p className='font-medium mb-0.5'>{a.plain_description}</p>
                   <p className='opacity-80'>{a.recommendation}</p>

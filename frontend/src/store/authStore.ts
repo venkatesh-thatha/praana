@@ -18,7 +18,10 @@ export const useAuthStore = create<AuthState>()(
         set({ token, userId })
       },
       logout: () => {
+        // Clear both the manual key (read by client.ts interceptor)
+        // and the Zustand persist entry (prevents stale token rehydration on next load)
         localStorage.removeItem('praana_token')
+        localStorage.removeItem('praana-auth')
         set({ token: null, userId: null })
       },
     }),

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: praana-backend
+    env: python
+    rootDir: .
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: praana
+      - key: JWT_SECRET
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ICD11_CLIENT_ID
+        sync: false
+      - key: ICD11_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

@@ -39,8 +39,9 @@ export default function DietPage() {
     <Layout>
       <div className='max-w-2xl mx-auto px-4 py-8'>
         <div className='flex items-center gap-3 mb-6'>
-          <Salad className='text-green-400' size={24} />
-          <h1 className='text-2xl font-bold text-white'>Diet Intelligence</h1>
+          {/* Sage matches Dashboard module card icon color */}
+          <Salad size={24} style={{ color: '#8fbf6e' }} />
+          <h1 className='text-2xl font-bold' style={{ color: '#ede9e0' }}>Diet Intelligence</h1>
         </div>
 
         {/* Input */}
@@ -58,7 +59,13 @@ export default function DietPage() {
             className='btn-primary flex items-center gap-2 w-full justify-center'
           >
             {loading ? (
-              <><div className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin' />Analysing...</>
+              <>
+                <div
+                  className='w-4 h-4 border-2 rounded-full animate-spin'
+                  style={{ borderColor: 'rgba(143,191,110,0.2)', borderTopColor: '#8fbf6e' }}
+                />
+                Analysing...
+              </>
             ) : (
               <><Send size={16} />Analyse Diet</>
             )}
@@ -67,10 +74,10 @@ export default function DietPage() {
 
         {/* Error card */}
         {apiError && (
-          <div className='mb-4 p-4 bg-red-900/30 border border-red-700/50 rounded-xl'>
-            <p className='text-sm font-medium text-red-300 mb-1'>Analysis failed</p>
-            <p className='text-xs text-red-200'>{apiError}</p>
-            <p className='text-xs text-slate-400 mt-2'>Check your internet connection and try again. Your food log has been saved.</p>
+          <div className='mb-4 p-4 rounded-xl' style={{ background: 'rgba(217,114,114,0.08)', border: '1px solid rgba(217,114,114,0.25)' }}>
+            <p className='text-sm font-medium mb-1' style={{ color: '#d97272' }}>Analysis failed</p>
+            <p className='text-xs' style={{ color: '#f0a0a0' }}>{apiError}</p>
+            <p className='text-xs mt-2' style={{ color: '#7a7a6e' }}>Check your internet connection and try again. Your food log has been saved.</p>
           </div>
         )}
 
@@ -80,80 +87,127 @@ export default function DietPage() {
             {/* Nutritional summary */}
             {result.nutritional_summary && (
               <div className='card'>
-                <h3 className='font-semibold text-white mb-3'>Nutritional Summary</h3>
+                <h3 className='font-semibold mb-3' style={{ color: '#ede9e0' }}>Nutritional Summary</h3>
                 <div className='grid grid-cols-3 gap-3'>
                   {Object.entries(result.nutritional_summary)
                     .filter(([, v]) => v !== null)
                     .slice(0, 9)
                     .map(([key, value]) => (
-                      <div key={key} className='bg-slate-700/50 rounded-lg p-2.5 text-center'>
-                        <p className='text-lg font-bold text-white'>{String(value)}</p>
-                        <p className='text-xs text-slate-400'>{key.replace(/_/g, ' ')}</p>
+                      <div
+                        key={key}
+                        className='rounded-lg p-2.5 text-center'
+                        style={{ background: 'rgba(16,20,18,0.8)', border: '1px solid rgba(143,191,110,0.1)' }}
+                      >
+                        <p className='text-lg font-bold' style={{ color: '#ede9e0' }}>{String(value)}</p>
+                        <p className='text-xs' style={{ color: '#7a7a6e' }}>{key.replace(/_/g, ' ')}</p>
                       </div>
                     ))}
                 </div>
               </div>
             )}
 
-            {/* Deficiency flags */}
+            {/* Deficiency flags — gold header */}
             {result.deficiency_flags?.length > 0 && (
-              <div className='card border-orange-800/50'>
-                <h3 className='font-semibold text-orange-300 mb-3 flex items-center gap-2'>
+              <div className='card' style={{ borderColor: 'rgba(201,168,76,0.25)' }}>
+                <h3 className='font-semibold mb-3 flex items-center gap-2' style={{ color: '#c9a84c' }}>
                   <TrendingDown size={16} /> Deficiency Flags
                 </h3>
                 {result.deficiency_flags.map((d: any, i: number) => (
-                  <div key={i} className='py-2 border-b border-slate-700/50 last:border-0'>
+                  <div
+                    key={i}
+                    className='py-2 last:border-0'
+                    style={{ borderBottom: '1px solid rgba(143,191,110,0.08)' }}
+                  >
                     <div className='flex items-center justify-between mb-0.5'>
-                      <span className='text-sm font-medium text-white'>{d.nutrient}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${d.severity === 'high' ? 'bg-red-900/50 text-red-300' : d.severity === 'moderate' ? 'bg-amber-900/50 text-amber-300' : 'bg-yellow-900/50 text-yellow-300'}`}>{d.severity}</span>
+                      <span className='text-sm font-medium' style={{ color: '#ede9e0' }}>{d.nutrient}</span>
+                      <span
+                        className='text-xs px-2 py-0.5 rounded-full'
+                        style={
+                          d.severity === 'high'
+                            ? { background: 'rgba(217,114,114,0.15)', color: '#d97272' }
+                            : d.severity === 'moderate'
+                            ? { background: 'rgba(201,168,76,0.15)', color: '#c9a84c' }
+                            : { background: 'rgba(201,168,76,0.1)', color: '#c9a84c' }
+                        }
+                      >
+                        {d.severity}
+                      </span>
                     </div>
-                    <p className='text-xs text-slate-400'>{d.detail}</p>
-                    <p className='text-xs text-teal-400 mt-0.5'>{d.profile_relevance}</p>
+                    <p className='text-xs' style={{ color: '#7a7a6e' }}>{d.detail}</p>
+                    {/* Profile relevance uses sage accent */}
+                    <p className='text-xs mt-0.5' style={{ color: '#8fbf6e' }}>{d.profile_relevance}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Food-symptom correlations */}
+            {/* Food-symptom correlations — sage header */}
             {result.food_symptom_correlations?.length > 0 && (
-              <div className='card border-purple-800/50'>
-                <h3 className='font-semibold text-purple-300 mb-3'>Food-Symptom Links</h3>
+              <div className='card' style={{ borderColor: 'rgba(143,191,110,0.2)' }}>
+                <h3 className='font-semibold mb-3' style={{ color: '#8fbf6e' }}>Food-Symptom Links</h3>
                 {result.food_symptom_correlations.map((c: any, i: number) => (
-                  <div key={i} className='py-2 border-b border-slate-700/50 last:border-0'>
-                    <p className='text-sm text-white'><span className='text-purple-300'>{c.food}</span> → <span className='text-red-300'>{c.symptom}</span></p>
-                    <p className='text-xs text-slate-400 mt-0.5'>{c.mechanism}</p>
+                  <div
+                    key={i}
+                    className='py-2 last:border-0'
+                    style={{ borderBottom: '1px solid rgba(143,191,110,0.08)' }}
+                  >
+                    <p className='text-sm' style={{ color: '#ede9e0' }}>
+                      <span style={{ color: '#8fbf6e' }}>{c.food}</span>
+                      {' → '}
+                      <span style={{ color: '#d97272' }}>{c.symptom}</span>
+                    </p>
+                    <p className='text-xs mt-0.5' style={{ color: '#7a7a6e' }}>{c.mechanism}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Additive warnings */}
+            {/* Additive warnings — danger header */}
             {result.additive_warnings?.length > 0 && (
-              <div className='card border-red-800/50'>
-                <h3 className='font-semibold text-red-300 mb-3 flex items-center gap-2'>
+              <div className='card' style={{ borderColor: 'rgba(217,114,114,0.2)' }}>
+                <h3 className='font-semibold mb-3 flex items-center gap-2' style={{ color: '#d97272' }}>
                   <AlertTriangle size={14} /> Additive Warnings
                 </h3>
                 {result.additive_warnings.map((a: any, i: number) => (
-                  <div key={i} className='py-2 border-b border-slate-700/50 last:border-0'>
-                    <p className='text-sm text-white'>{a.additive} {a.e_number && <span className='text-slate-500 text-xs'>({a.e_number})</span>}</p>
-                    <p className='text-xs text-slate-400'>{a.concern}</p>
-                    {a.profile_interaction && <p className='text-xs text-amber-300 mt-0.5'>⚠ {a.profile_interaction}</p>}
+                  <div
+                    key={i}
+                    className='py-2 last:border-0'
+                    style={{ borderBottom: '1px solid rgba(143,191,110,0.08)' }}
+                  >
+                    <p className='text-sm' style={{ color: '#ede9e0' }}>
+                      {a.additive}{' '}
+                      {a.e_number && <span style={{ color: '#7a7a6e', fontSize: '0.75rem' }}>({a.e_number})</span>}
+                    </p>
+                    <p className='text-xs' style={{ color: '#7a7a6e' }}>{a.concern}</p>
+                    {a.profile_interaction && (
+                      <p className='text-xs mt-0.5' style={{ color: '#c9a84c' }}>⚠ {a.profile_interaction}</p>
+                    )}
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Substitutions */}
+            {/* Substitutions — sage header */}
             {result.substitution_suggestions?.length > 0 && (
-              <div className='card border-green-800/50'>
-                <h3 className='font-semibold text-green-300 mb-3'>Substitution Suggestions</h3>
+              <div className='card' style={{ borderColor: 'rgba(143,191,110,0.2)' }}>
+                <h3 className='font-semibold mb-3' style={{ color: '#8fbf6e' }}>Substitution Suggestions</h3>
                 {result.substitution_suggestions.map((s: any, i: number) => (
-                  <div key={i} className='py-2 border-b border-slate-700/50 last:border-0 flex items-start gap-2'>
+                  <div
+                    key={i}
+                    className='py-2 last:border-0 flex items-start gap-2'
+                    style={{ borderBottom: '1px solid rgba(143,191,110,0.08)' }}
+                  >
                     <span className='text-xs mt-0.5'>🔄</span>
                     <div>
-                      <p className='text-sm text-white'><span className='line-through text-slate-400'>{s.replace}</span> → <span className='text-green-300'>{s.with || s.with_food}</span></p>
-                      <p className='text-xs text-slate-400'>{s.reason}</p>
-                      {s.budget_friendly && <span className='text-xs text-teal-400'>Budget friendly</span>}
+                      <p className='text-sm' style={{ color: '#ede9e0' }}>
+                        <span style={{ textDecoration: 'line-through', color: '#7a7a6e' }}>{s.replace}</span>
+                        {' → '}
+                        <span style={{ color: '#8fbf6e' }}>{s.with || s.with_food}</span>
+                      </p>
+                      <p className='text-xs' style={{ color: '#7a7a6e' }}>{s.reason}</p>
+                      {s.budget_friendly && (
+                        <span className='text-xs' style={{ color: '#8fbf6e' }}>Budget friendly</span>
+                      )}
                     </div>
                   </div>
                 ))}
